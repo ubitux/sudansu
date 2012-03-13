@@ -63,7 +63,6 @@ static void init(struct sudansu *ctx)
     ctx->h.right = ctx->nodes;
     ctx->h.left  = ctx->nodes + NODES_WIDTH-1;
     for (i = 0; i < NODES_WIDTH; i++) {
-        ctx->nodes[i].size  = N;
         ctx->nodes[i].left  = i ==             0 ? &ctx->h : &ctx->nodes[i - 1];
         ctx->nodes[i].right = i == NODES_WIDTH-1 ? &ctx->h : &ctx->nodes[i + 1];
     }
@@ -77,10 +76,10 @@ static void init(struct sudansu *ctx)
                 /* locate the CST_N nodes per row */
                 for (cst_type = 0; cst_type < CST_N; cst_type++) {
                     unsigned col = get_node_position(cst_type, r, c, z);
+                    struct node *colhead = &ctx->nodes[cst_type*N*N + col];
 
-                    x = ctx->nodes[cst_type*N*N + col].down; // skip the header
-                    while (x->name) // locate first unused node of the column
-                        x = x->down;
+                    // locate first unused node of the colum
+                    x = colhead->down + NODES_WIDTH * colhead->size++;
                     x->name = CELL_NAME(r, c, z+'1');
                     row_nodes[cst_type] = x;
                 }
